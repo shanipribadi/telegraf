@@ -155,7 +155,13 @@ func (p *Postgresql) accRow(row scanner, acc telegraf.Accumulator, columns []str
 	}
 	if columnMap["datname"] != nil {
 		// extract the database name from the column map
-		dbname.WriteString((*columnMap["datname"]).(string))
+		datname, ok := ((*columnMap["datname"]).(string))
+		if ok {
+			dbname.WriteString(datname)
+		} else {
+			// introduced in PG12 for global objects
+			dbname.WriteString("postgres_global")
+		}
 	} else {
 		dbname.WriteString("postgres")
 	}
